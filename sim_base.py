@@ -1,3 +1,7 @@
+from calendar import c
+
+# Used https://pyquestions.com/converting-a-number-to-binary-with-a-fixed-length to figure out how to make a fixed length binary string from an int
+
 def get_bits(number, idx1, idx2):
     """Returns the bits of number between idx1 and idx2 as an integer"""
     if idx1 > idx2:
@@ -11,8 +15,52 @@ def execute(instruction, oldPC):
     """Handles a single instruction, returning the new PC"""
     global M, R
     
+    bin_instruction = '{0:08b}'.format(instruction)
     # to do: add instructions here
+    if bin_instruction[0] == 1: # If set, an invalid instruction. Do not do work or advance the PC if this bit is 1.
+        return oldPC
     
+    icode = bin_instruction[1:4] # Specifies what action to take
+    a = bin_instruction[4: 6] # The index of a register
+    b = bin_instruction[6: 8] # The index of another register, or details about icode
+
+    icode = int(icode, 2)
+    a = int(a, 2)
+    b = int(b, 2)
+
+    if icode == 0:
+        R[a] = R[b]
+    elif icode == 1:
+        R[a] += R[b]
+    elif icode == 2:
+        R[a] &= R[b]
+    elif icode == 3:
+        R[a] = M[R[b]]
+    elif icode == 4:
+        M[R[b]] = R[a]
+    elif icode == 5:
+        if b == 0:
+            R[a] = ~R[a]
+        elif b == 1:
+            R[a] = -R[a]
+        elif b == 2:
+            R[a] = not R[a]
+        elif b == 3:
+            R[a] = oldPC
+    elif icode == 6:
+        if b == 0:
+            R[a] = M[oldPC + 1]
+        elif b == 1:
+            R[a] += M[oldPC + 1]
+        elif b == 2:
+            R[a] &= M[oldPC + 1]
+        elif b == 3:
+            R[a] = M[M[oldPC + 1]]
+        oldPC += 1 # net increase pc by 2
+    elif icode == 7:
+        if R[i] == 0 or R[i] >= 0x80:
+            return R[b]
+
     return oldPC + 1
 
 
