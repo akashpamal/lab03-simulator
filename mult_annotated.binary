@@ -63,7 +63,7 @@ Program as comments:
 
 
 // halt once the program is complete
-# 1 000 0000
+80 # 1 000 0000
 
 
 
