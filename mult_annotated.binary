@@ -4,26 +4,50 @@ y: 0x03
 rolling_sum: 0x80
 index: 0x81
 
-Program:
-// store 0x01 in r0. This represents x right now
-// store 0x03 in r1. This represents y right now
-// store 0 in r2. This represents rolling_sum right now
-// store 0 in r3. This represents index right now
+Program as comments:
 
-// rolling_sum += x i.e. r2 += r0
+6 0_0 (0x05) // store 0x05 in r0. This represents x right now. the value in parenthesis is the next byte. With the example here, we're multiplying 5 and 6.
+6 1_0 (0x06) // store 0x06 in r1. This represents y right now
 
-// index += 1. r3 += value_at_pc_plus_1. This instruction will be 2 bytes long.
+6 2_0 (0x00) // store 0 in r2. This represents the starting value of rolling_sum
+6 0_0 (0x80) // to start, write rolling_sum at memory address 0x80 i.e. write r2 to memory at address 0x80
+4 2_0
+6 3_0 (0x00) // store 0 in r3. This represents the starting value of index
+
+
+// Start our loop here
+
+6 2_3 (0x80)// load the value of rolling_sum from memory into r2. We have to do this every loop because we use r2 for other things inside the loop
+
+
+1 2_0 // rolling_sum += x i.e. r2 += r0
+
+6 3_1 (1)// index += 1. r3 += value_at_pc_plus_1. This instruction will be 2 bytes long.
 
 
 // (index - y) and rolling_sum are going to share the same register.
 // When calculating index-y, temporarily store rolling_sum into memory, do the appropriate math, and then load it back into the register.
 
-// store rolling_sum at 0x80. i.e. store the value of r2 at address 0x80
-// set r2 to index
-// r2 -= y i.e. r2 -= r1. now the value inside r2 is index - y
-// if (index - y) <=0, set pc = the place where we want to jump to. i.e. if r2 <= 0, set pc to the instruction where we add x to the rolling sum
-// load rolling_sum from memory. i.e. load the value at address 0x80 into r2
+6 0_0 (0x80) // set r0 to 0x80. We have to do this because there's no instruction to directly write to a given memory address
+4 2_0 // store rolling_sum at 0x80. i.e. store the value of r2 at address 0x80 i.e. store the value of r2 at the memory address inside r0
+6 2_0 (0x00) // set r2 to index i.e. r2 = 0, r2 += r3
+1 2_3
+
+// The next couple of lines are to do index -= y
+5 1_1 // First, negate y i.e. negate r1 i.e. r1 = -r1
+1 2_1 // Then, add the new (negated) y to index i.e. r2 += r1. now the value inside r2 is index - y
+5 1_1 // Undo the negation of y i.e. r1 = -r1
+
+// At this point, the registers store, in order: 0x80, y, (index - y), index
+6 0_3 (0x56) // Store the memory address where our while-loop begins inside r0 i.e. r0 = 0x56 or whatever the memory address is. MAKE SURE THE MEMORY ADDRESS IS IN HEX
+
+// At this point, the registers store, in order: 0x56, y, (index - y), index. 0x56 is the memory address where we want to begin our while-loop
+
+7 2_0 // if (index - y) <=0, set pc = the place where we want to jump to. i.e. if r2 <= 0, set pc to the instruction where we add x to the rolling sum
+// load rolling_sum back from memory. i.e. load the value at address 0x80 into r2 (using instruction 6.3) Another way to do this is using instruction 3, assuming r0 still says 0x80
 // subtract x from rolling_sum. i.e. r2 -= r0
+// set r0 to x i.e. r0 = 0x01 (same as line 1) to reset r0 to x
+
 
 
 // store the product at address 0xA0
