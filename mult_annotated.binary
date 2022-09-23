@@ -5,6 +5,40 @@ rolling_sum: 0x80
 index: 0x81
 
 Program:
+// store 0x01 in r0. This represents x right now
+// store 0x03 in r1. This represents y right now
+// store 0 in r2. This represents rolling_sum right now
+// store 0 in r3. This represents index right now
+
+// rolling_sum += x i.e. r2 += r0
+
+// index += 1. r3 += value_at_pc_plus_1. This instruction will be 2 bytes long.
+
+
+// (index - y) and rolling_sum are going to share the same register.
+// When calculating index-y, temporarily store rolling_sum into memory, do the appropriate math, and then load it back into the register.
+
+// store rolling_sum at 0x80. i.e. store the value of r2 at address 0x80
+// set r2 to index
+// r2 -= y i.e. r2 -= r1. now the value inside r2 is index - y
+// if (index - y) <=0, set pc = the place where we want to jump to. i.e. if r2 <= 0, set pc to the instruction where we add x to the rolling sum
+// load rolling_sum from memory. i.e. load the value at address 0x80 into r2
+// subtract x from rolling_sum. i.e. r2 -= r0
+
+
+// store the product at address 0xA0
+
+
+
+
+// halt once the program is complete
+1 000 0000
+
+
+
+
+
+Java code:
 
 int x = 10;
 int y = 9;
