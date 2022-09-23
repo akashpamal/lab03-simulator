@@ -8,8 +8,8 @@ Program as comments:
 
 
 
-60 01 # 6 0_0 (0x01) // store 0x05 in r0. This represents x right now. the value in parenthesis is the next byte. With the example here, we're multiplying 5 and 6.
-64 03 # 6 1_0 (0x03) // store 0x06 in r1. This represents y right now
+60 03 # 6 0_0 (0x01) // store 0x05 in r0. This represents x right now. the value in parenthesis is the next byte. With the example here, we're multiplying 5 and 6.
+64 01 # 6 1_0 (0x03) // store 0x06 in r1. This represents y right now
 68 00 # 6 2_0 (0x00) // store 0 in r2. This represents rolling_sum right now
 6C 00 # 6 3_0 (0x00) // store 0 in r3. This represents index right now
 
@@ -39,7 +39,7 @@ Program as comments:
 55 # 5 1_1 // Undo the negation of y i.e. r1 = -r1
 
 // At this point, the registers store, in order: 0x80, y, (index - y), index
-63 09 # 6 0_3 (0x09) // Store the memory address where our while-loop begins inside r0 i.e. r0 = 0x09 or whatever the memory address is. MAKE SURE THE MEMORY ADDRESS IS IN HEX
+69 08 # 6 2_1 (0x08) // Store the memory address where our while-loop begins inside r0 i.e. r0 = 0x09 or whatever the memory address is. MAKE SURE THE MEMORY ADDRESS IS IN HEX
 
 // At this point, the registers store, in order: 0x09, y, (index - y), index. 0x09 is the memory address where we want to begin our while-loop
 
