@@ -6,18 +6,12 @@ index: 0x81
 
 Program as comments:
 
-6 0_0 (0x05) // store 0x05 in r0. This represents x right now. the value in parenthesis is the next byte. With the example here, we're multiplying 5 and 6.
-6 1_0 (0x06) // store 0x06 in r1. This represents y right now
-
-6 2_0 (0x00) // store 0 in r2. This represents the starting value of rolling_sum
-6 0_0 (0x80) // to start, write rolling_sum at memory address 0x80 i.e. write r2 to memory at address 0x80
-4 2_0
-6 3_0 (0x00) // store 0 in r3. This represents the starting value of index
 
 
-// Start our loop here
-
-6 2_3 (0x80)// load the value of rolling_sum from memory into r2. We have to do this every loop because we use r2 for other things inside the loop
+6 0_0 (0x01) // store 0x05 in r0. This represents x right now. the value in parenthesis is the next byte. With the example here, we're multiplying 5 and 6.
+6 1_0 (0x03) // store 0x06 in r1. This represents y right now
+6 2_0 (0x00) // store 0 in r2. This represents rolling_sum right now
+6 3_0 (0x00) // store 0 in r3. This represents index right now
 
 
 1 2_0 // rolling_sum += x i.e. r2 += r0
