@@ -14,6 +14,12 @@ Program as comments:
 6 3_0 (0x00) // store 0 in r3. This represents index right now
 
 
+// Before the meat and potatos part of our loop, we want to reload all our variables from memory and put them back into the registers
+6 0_0 (0x01) // Load x back from memory
+6 1_0 (0x03) // Load y back from memory (although this line should be unnecessary)
+6 2_3 (0x80) // Load rolling_sum back from memory
+
+
 1 2_0 // rolling_sum += x i.e. r2 += r0
 
 6 3_1 (1)// index += 1. r3 += value_at_pc_plus_1. This instruction will be 2 bytes long.
@@ -33,20 +39,27 @@ Program as comments:
 5 1_1 // Undo the negation of y i.e. r1 = -r1
 
 // At this point, the registers store, in order: 0x80, y, (index - y), index
-6 0_3 (0x56) // Store the memory address where our while-loop begins inside r0 i.e. r0 = 0x56 or whatever the memory address is. MAKE SURE THE MEMORY ADDRESS IS IN HEX
+6 0_3 (0x09) // Store the memory address where our while-loop begins inside r0 i.e. r0 = 0x09 or whatever the memory address is. MAKE SURE THE MEMORY ADDRESS IS IN HEX
 
-// At this point, the registers store, in order: 0x56, y, (index - y), index. 0x56 is the memory address where we want to begin our while-loop
+// At this point, the registers store, in order: 0x09, y, (index - y), index. 0x09 is the memory address where we want to begin our while-loop
 
 7 2_0 // if (index - y) <=0, set pc = the place where we want to jump to. i.e. if r2 <= 0, set pc to the instruction where we add x to the rolling sum
-// load rolling_sum back from memory. i.e. load the value at address 0x80 into r2 (using instruction 6.3) Another way to do this is using instruction 3, assuming r0 still says 0x80
-// subtract x from rolling_sum. i.e. r2 -= r0
-// set r0 to x i.e. r0 = 0x01 (same as line 1) to reset r0 to x
+6 2_3 (0x80) // load rolling_sum back from memory. i.e. load the value at address 0x80 into r2 (using instruction 6.3) Another way to do this is using instruction 3, assuming r0 still says 0x80
 
 
+6 0_0 (0x01) // Load x back from memory
+6 1_0 (0x03) // Load y back from memory (although this line should be unnecessary)
+6 2_3 (0x80) // Load rolling_sum back from memory
+
+
+// In the next couple of lines, subtract x from rolling_sum. i.e. r2 -= r
+5 0_1 // x = -x i.e. r0 = -r0
+1 2_0 // add the newly negated x to rolling_sum i.e. r2 += r0
+5 0_1 // undo the negation of x i.e. r0 = -r0
 
 // store the product at address 0xA0
-
-
+6 1_0 (0xA0) // r0 = 0xA0
+4 2_0 // store rolling_sum at 0xA0. i.e. store the value of r2 at address 0xA0 i.e. store the value of r2 at the memory address inside r0
 
 
 // halt once the program is complete
