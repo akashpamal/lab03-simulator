@@ -6,9 +6,9 @@ public class Multiply {
         int index = 0;
 
         do {
-            rolling_sum = rolling_sum + x;
-            index = index + 1;
-        } while (index <= y);
+            rolling_sum += x;
+            index += 1;
+        } while (index - y <= 0);
         rolling_sum -= x;
         System.out.println("Product: " + rolling_sum);
     }

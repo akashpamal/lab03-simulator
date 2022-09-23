@@ -1,5 +1,19 @@
-Binary:
+Variables in memory:
+x: 0x01
+y: 0x03
+rolling_sum: 0x80
+index: 0x81
 
+Program:
 
+int x = 10;
+int y = 9;
+int rolling_sum = 0;
+int index = 0;
 
-Hex:
+do {
+    rolling_sum += x;
+    index += 1;
+} while (index - y <= 0);
+rolling_sum -= x;
+System.out.println("Product: " + rolling_sum);
