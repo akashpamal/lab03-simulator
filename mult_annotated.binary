@@ -8,15 +8,15 @@ Program as comments:
 
 
 
-60 03 # 6 0_0 (0x01) // store 0x05 in r0. This represents x right now. the value in parenthesis is the next byte. With the example here, we're multiplying 5 and 6.
+60 05 # 6 0_0 (0x01) // store 0x05 in r0. This represents x right now. the value in parenthesis is the next byte. With the example here, we're multiplying 5 and 6.
 64 01 # 6 1_0 (0x03) // store 0x06 in r1. This represents y right now
 68 00 # 6 2_0 (0x00) // store 0 in r2. This represents rolling_sum right now
 6C 00 # 6 3_0 (0x00) // store 0 in r3. This represents index right now
 
 
 // Before the meat and potatos part of our loop, we want to reload all our variables from memory and put them back into the registers
-60 01 # 6 0_0 (0x01) // Load x back from memory
-64 03 # 6 1_0 (0x03) // Load y back from memory (although this line should be unnecessary)
+63 01 # 6 0_3 (0x01) // Load x back from memory
+67 03 # 6 1_3 (0x03) // Load y back from memory (although this line should be unnecessary)
 6B 80 # 6 2_3 (0x80) // Load rolling_sum back from memory
 
 
@@ -39,7 +39,7 @@ Program as comments:
 55 # 5 1_1 // Undo the negation of y i.e. r1 = -r1
 
 // At this point, the registers store, in order: 0x80, y, (index - y), index
-69 08 # 6 2_1 (0x08) // Store the memory address where our while-loop begins inside r0 i.e. r0 = 0x09 or whatever the memory address is. MAKE SURE THE MEMORY ADDRESS IS IN HEX
+60 08 # 6 0_0 (0x08) // Store the memory address where our while-loop begins inside r0 i.e. r0 = 0x09 or whatever the memory address is. MAKE SURE THE MEMORY ADDRESS IS IN HEX
 
 // At this point, the registers store, in order: 0x09, y, (index - y), index. 0x09 is the memory address where we want to begin our while-loop
 
@@ -47,8 +47,8 @@ Program as comments:
 6B 80 # 6 2_3 (0x80) // load rolling_sum back from memory. i.e. load the value at address 0x80 into r2 (using instruction 6.3) Another way to do this is using instruction 3, assuming r0 still says 0x80
 
 
-60 01 # 6 0_0 (0x01) // Load x back from memory
-64 03 # 6 1_0 (0x03) // Load y back from memory (although this line should be unnecessary)
+63 01 # 6 0_3 (0x01) // Load x back from memory
+67 03 # 6 1_3 (0x03) // Load y back from memory (although this line should be unnecessary)
 6B 80 # 6 2_3 (0x80) // Load rolling_sum back from memory
 
 
@@ -58,7 +58,7 @@ Program as comments:
 51 # 5 0_1 // undo the negation of x i.e. r0 = -r0
 
 // store the product at address 0xA0
-64 A0 # 6 1_0 (0xA0) // r0 = 0xA0
+60 A0 # 6 0_0 (0xA0) // r0 = 0xA0
 48 # 4 2_0 // store rolling_sum at 0xA0. i.e. store the value of r2 at address 0xA0 i.e. store the value of r2 at the memory address inside r0
 
 
