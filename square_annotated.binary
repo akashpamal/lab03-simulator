@@ -1,0 +1,106 @@
+Variables in memory:
+x: 0x01
+y: 0x03
+rolling_sum: 0x80
+index: 0x81
+x: 0x82
+y: 0x83
+memory address that stores the location of the beginning of the for-loop: 0x84
+
+Program as comments:
+
+
+68 03 # 6 2_0 (0x03) // load value at memory address 0x01 into r2
+0E # 0 3_2 // r3 = r2
+82 09 # 8 0_2 0x09 // save the current pc to the stack and jump to the function
+68 A0 # 6 2_0 0xA0 // write (0xA0) to r2
+42 # 4 0_2 // save output of function to 0xA0 i.e. save contents of r1 to A0 i.e. save the contents of r0 to the memory address at r2
+FF # // end the program
+
+
+{} removed this line 60 05 # 6 0_0 (0x01) // store 0x05 in r0. This represents x right now. the value in parenthesis is the next byte. With the example here, we're multiplying 5 and 6.
+{} removed this line 64 01 # 6 1_0 (0x03) // store 0x06 in r1. This represents y right now
+
+84 # 8 1_0 // save the contents of register 1 to the stack
+02 # 0 0_2 // load x into r0 from r2
+07 # 0 1_3 // load y into r1 from r3
+68 82 # 6 2_0 0x82 // r2 = 0x82
+42 # 4 0_2 // write x to memory at 0x82 aka write x to memory at address inside r2
+68 83 # 6 2_0 0x83 // r2 = 0x83
+46 # 4 1_2 // write y to memory at 0x83
+
+
+68 00 # 6 2_0 (0x00) // store 0 in r2. This represents rolling_sum right now
+6C 00 # 6 3_0 (0x00) // store 0 in r3. This represents index right now
+
+
+// Before the meat and potatos part of our loop, we want to reload all our variables from memory and put them back into the registers
+// the next few steps save the beginning location to a register, and then save it to memory
+53 # 5 0_3 // save the current pc to r0
+64 84 # 6 1_0 0x84 // r1 = 0x84
+41 # 4 0_1 // write r0 to memory at 0x84
+
+63 82 # 6 0_3 (0x82) // can't load these directly anymore. must load them from an actual memory address. Load x back from memory
+67 83 # 6 1_3 (0x83) // Load y back from memory
+6B 80 # 6 2_3 (0x80) // Load rolling_sum back from memory
+
+
+18 # 1 2_0 // rolling_sum += x i.e. r2 += r0
+
+6D 01 # 6 3_1 (1)// index += 1. r3 += value_at_pc_plus_1. This instruction will be 2 bytes long.
+
+
+// (index - y) and rolling_sum are going to share the same register.
+// When calculating index-y, temporarily store rolling_sum into memory, do the appropriate math, and then load it back into the register.
+
+60 80 # 6 0_0 (0x80) // set r0 to 0x80. We have to do this because there's no instruction to directly write to a given memory address
+48 # 4 2_0 // store rolling_sum at 0x80. i.e. store the value of r2 at address 0x80 i.e. store the value of r2 at the memory address inside r0
+68 00 # 6 2_0 (0x00) // set r2 to index i.e. r2 = 0, r2 += r3
+1B # 1 2_3
+
+// The next couple of lines are to do index -= y
+55 # 5 1_1 // First, negate y i.e. negate r1 i.e. r1 = -r1
+19 # 1 2_1 // Then, add the new (negated) y to index i.e. r2 += r1. now the value inside r2 is index - y
+55 # 5 1_1 // Undo the negation of y i.e. r1 = -r1
+
+// At this point, the registers store, in order: 0x80, y, (index - y), index
+{} removed this line: 60 08 # 6 0_0 (0x08) // Store the memory address where our while-loop begins inside r0 i.e. r0 = 0x09 or whatever the memory address is. MAKE SURE THE MEMORY ADDRESS IS IN HEX
+63 84 # 6 0_3 0x84 // read the memory address of the beginning of the loop and store it in r0. We stored this address itself in memory at 0x84
+
+// At this point, the registers store, in order: 0x09, y, (index - y), index. 0x09 is the memory address where we want to begin our while-loop
+
+78 # 7 2_0 // if (index - y) <=0, set pc = the place where we want to jump to. i.e. if r2 <= 0, set pc to the instruction where we add x to the rolling sum
+6B 80 # 6 2_3 (0x80) // load rolling_sum back from memory. i.e. load the value at address 0x80 into r2 (using instruction 6.3) Another way to do this is using instruction 3, assuming r0 still says 0x80
+
+
+63 82 # 6 0_3 (0x82) // can't load these directly anymore. must load them from an actual memory address. Load x back from memory
+67 83 # 6 1_3 (0x83) // Load y back from memory
+6B 80 # 6 2_3 (0x80) // Load rolling_sum back from memory
+
+
+// In the next couple of lines, subtract x from rolling_sum. i.e. r2 -= r
+51 # 5 0_1 // x = -x i.e. r0 = -r0
+18 # 1 2_0 // add the newly negated x to rolling_sum i.e. r2 += r0
+51 # 5 0_1 // undo the negation of x i.e. r0 = -r0
+
+02 # 0 0_2 // store rolling_sum inside r0. this is the value that the function "returns". i.e. store r2 to r1
+
+
+85 # 8 1_1 // TODO pop the contents of register 1 from the stack
+83 # 8 0_3 // return back outside this function
+
+
+
+Java code:
+
+int x = 10;
+int y = 9;
+int rolling_sum = 0;
+int index = 0;
+
+do {
+    rolling_sum += x;
+    index += 1;
+} while (index - y <= 0);
+rolling_sum -= x;
+System.out.println("Product: " + rolling_sum);

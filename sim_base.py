@@ -13,14 +13,14 @@ def get_bits(number, idx1, idx2):
 
 def execute(instruction, oldPC):
     """Handles a single instruction, returning the new PC"""
-    global M, R
+    global M, R, rsp
     
     bin_instruction = '{0:08b}'.format(instruction)
     # to do: add instructions here
-    if bin_instruction[0] == 1: # If set, an invalid instruction. Do not do work or advance the PC if this bit is 1.
-        return oldPC
+    # if bin_instruction[0] == 1: # If set, an invalid instruction. Do not do work or advance the PC if this bit is 1.
+    #     return oldPC
     
-    icode = bin_instruction[1:4] # Specifies what action to take
+    icode = bin_instruction[0:4] # Specifies what action to take
     a = bin_instruction[4: 6] # The index of a register
     b = bin_instruction[6: 8] # The index of another register, or details about icode
 
@@ -60,6 +60,21 @@ def execute(instruction, oldPC):
     elif icode == 7:
         if R[i] == 0 or R[i] >= 0x80:
             return R[b]
+    elif icode == 8:
+        pass
+    else: # icode > 8
+        if b == 0:
+            rsp -= 1
+            M[rsp] = R[a]
+        elif b == 1:
+            R[a] = M[rsp]
+            rsp += 1
+        elif b == 2:
+            R[a] = M[oldPC+2]
+            oldPC = M[oldPC+1] - 1 # net don't change pc
+        else: # b == 3
+            rsp -= 1
+            oldPC = M[rsp]
 
     return oldPC + 1
 
@@ -68,6 +83,7 @@ def execute(instruction, oldPC):
 # initialize memory and registers
 R = [0 for i in range(4)]
 M = [0 for i in range(256)]
+rsp = 0xFF
 
 # initialize control registers; do not modify these directly
 _ir = 0
@@ -76,7 +92,7 @@ _pc = 0
 
 def cycle():
     """Implement one clock cycle"""
-    global M, R, _pc, _ir
+    global M, R, _pc, _ir, rsp
     
     # execute
     _ir = M[_pc]
